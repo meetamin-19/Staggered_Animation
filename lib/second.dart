@@ -1,13 +1,13 @@
-
 import 'dart:async';
 
+import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 
 class StaggerAnimation extends StatelessWidget {
   StaggerAnimation({Key? key, required this.controller})
-      :
-        opacity = Tween<double>(
+
+      : opacity = Tween<double>(
           begin: 0.0,
           end: 1.0,
         ).animate(
@@ -23,13 +23,12 @@ class StaggerAnimation extends StatelessWidget {
           CurvedAnimation(
             parent: controller,
             curve: Curves.ease,
-
           ),
         ),
-        height = Tween<double>(begin: 0,end: 150).animate(
+        height = Tween<double>(begin: 0, end: 150).animate(
           CurvedAnimation(
             parent: controller,
-            curve:  Curves.ease,
+            curve: Curves.ease,
           ),
         ),
         padding = EdgeInsetsTween(
@@ -63,16 +62,20 @@ class StaggerAnimation extends StatelessWidget {
           CurvedAnimation(
             parent: controller,
             curve: Curves.ease,
-
           ),
+        ),
+        rotation = Tween(begin: 360.0, end: 0.0).animate(
+          CurvedAnimation(parent: controller, curve: Curves.easeIn),
         ),
         super(key: key);
 
   final Animation<double> controller;
   final Animation<double> opacity;
+  final Animation<double> rotation;
   final Animation<double> width;
   final Animation<double> height;
   final Animation<EdgeInsets> padding;
+
   // final Animation<BorderRadius> borderRadius;
   final Animation<Color?> color;
 
@@ -86,7 +89,7 @@ class StaggerAnimation extends StatelessWidget {
       child: Opacity(
         opacity: opacity.value,
         child: Transform.rotate(
-          angle: 15,
+          angle: rotation.value,
           child: Container(
             width: width.value,
             height: height.value,
@@ -149,7 +152,7 @@ class _StaggerDemoState extends State<StaggerDemo>
 
   @override
   Widget build(BuildContext context) {
-    timeDilation = 1.0; // 1.0 is normal animation speed.
+    timeDilation = 7.0; // 1.0 is normal animation speed.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Staggered Animation'),
