@@ -1,117 +1,125 @@
 import 'dart:async';
 
-import 'package:flutter/animation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 
-class StaggerAnimation extends StatelessWidget {
-  StaggerAnimation({Key? key, required this.controller})
-
-      : opacity = Tween<double>(
-          begin: 0.0,
-          end: 1.0,
-        ).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Curves.easeInCirc,
-          ),
-        ),
-        width = Tween<double>(
-          begin: 50.0,
-          end: 150.0,
-        ).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Curves.ease,
-          ),
-        ),
-        height = Tween<double>(begin: 0, end: 150).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Curves.ease,
-          ),
-        ),
-        padding = EdgeInsetsTween(
-          begin: const EdgeInsets.only(bottom: 16.0),
-          end: const EdgeInsets.only(bottom: 75.0),
-        ).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Curves.ease,
-          ),
-        ),
-
-        // borderRadius = BorderRadiusTween(
-        //   begin: BorderRadius.circular(4.0),
-        //   end: BorderRadius.circular(75.0),
-        // ).animate(
-        //   CurvedAnimation(
-        //     parent: controller,
-        //     curve: Interval(
-        //       0.375,
-        //       0.500,
-        //       curve: Curves.ease,
-        //     ),
-        //   ),
-        // ),
-
-        color = ColorTween(
-          begin: Colors.indigo[100],
-          end: Colors.orange[400],
-        ).animate(
-          CurvedAnimation(
-            parent: controller,
-            curve: Curves.ease,
-          ),
-        ),
-        rotation = Tween(begin: 360.0, end: 0.0).animate(
-          CurvedAnimation(parent: controller, curve: Curves.easeIn),
-        ),
-        super(key: key);
+class StaggerAnimation extends StatefulWidget {
+  StaggerAnimation({Key? key, required this.controller});
 
   final Animation<double> controller;
-  final Animation<double> opacity;
-  final Animation<double> rotation;
-  final Animation<double> width;
-  final Animation<double> height;
-  final Animation<EdgeInsets> padding;
 
-  // final Animation<BorderRadius> borderRadius;
-  final Animation<Color?> color;
+  @override
+  State<StaggerAnimation> createState() => _StaggerAnimationState();
+}
 
-  // This function is called each time the controller "ticks" a new frame.
-  // When it runs, all of the animation's values will have been
-  // updated to reflect the controller's current value.
+class _StaggerAnimationState extends State<StaggerAnimation> {
+  late final Animation<double> opacity;
+  late final Animation<double> opacity_border;
+  late final Animation<double> rotation;
+  late final Animation<double> rotation_border;
+  late final Animation<double> width;
+  late final Animation<double> width_border;
+  late final Animation<double> height;
+  late final Animation<double> height_border;
+
   Widget _buildAnimation(BuildContext context, Widget? child) {
-    return Container(
-      padding: padding.value,
-      alignment: Alignment.bottomCenter,
-      child: Opacity(
-        opacity: opacity.value,
-        child: Transform.rotate(
-          angle: rotation.value,
-          child: Container(
-            width: width.value,
-            height: height.value,
-            decoration: BoxDecoration(
-              color: color.value,
-              border: Border.all(
-                color: Colors.indigo[300]!,
-                width: 3.0,
-              ),
-              // borderRadius: borderRadius.value,
-            ),
+    var h = MediaQuery.of(context).size.height;
+    var w = MediaQuery.of(context).size.width;
+    return Stack(
+      children: [
+        Container(
+          alignment: Alignment.center,
+          child: SizedBox(
+            width: h * 0.6,
+            height: w * 0.8,
+            child: Opacity(
+                opacity: opacity.value,
+                child: Hero(
+                    tag: 8,
+                    child: Image.asset("assets/images/secondwoborder.png"))),
           ),
         ),
+        Center(
+          child: SizedBox(
+              width: w * .78,
+              height: h * .65,
+              child:
+                  Hero(tag: 9, child: Image.asset("assets/images/border.png"))),
+          // ),
+        )
+      ],
+    );
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    opacity = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+          parent: widget.controller,
+          curve: const Interval(
+            0.2,
+            0.8,
+            curve: Curves.easeInCirc,
+          )),
+    );
+    opacity_border = Tween<double>(
+      begin: 1.0,
+      end: 1,
+    ).animate(CurvedAnimation(
+        parent: widget.controller,
+        curve: const Interval(0.0, 0.5, curve: Curves.easeInCirc)));
+    width_border = Tween<double>(
+      begin: 150.0,
+      end: 320.0,
+    ).animate(
+      CurvedAnimation(
+        parent: widget.controller,
+        curve: Curves.ease,
       ),
     );
+    width = Tween<double>(
+      begin: 300.0,
+      end: 300,
+    ).animate(
+      CurvedAnimation(
+        parent: widget.controller,
+        curve: Curves.ease,
+      ),
+    );
+    height_border = Tween<double>(begin: 400, end: 440).animate(
+      CurvedAnimation(
+        parent: widget.controller,
+        curve: const Interval(0.3, 1.0, curve: Curves.ease),
+      ),
+    );
+    height = Tween<double>(begin: 200, end: 420).animate(
+      CurvedAnimation(
+        parent: widget.controller,
+        curve: Interval(0.0, 0.8, curve: Curves.ease),
+      ),
+    );
+    rotation_border = Tween(begin: -1.0, end: 0.0).animate(
+      CurvedAnimation(
+          parent: widget.controller,
+          curve: Interval(0.2, .9, curve: Curves.easeInCirc)),
+    );
+    rotation = Tween(begin: -1.0, end: 0.0).animate(
+      CurvedAnimation(
+          parent: widget.controller,
+          curve: Interval(0.2, 0.6, curve: Curves.easeIn)),
+    );
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       builder: _buildAnimation,
-      animation: controller,
+      animation: widget.controller,
     );
   }
 }
@@ -130,7 +138,6 @@ class _StaggerDemoState extends State<StaggerDemo>
   @override
   void initState() {
     super.initState();
-
     _controller = AnimationController(
         duration: const Duration(milliseconds: 700), vsync: this);
   }
@@ -144,7 +151,7 @@ class _StaggerDemoState extends State<StaggerDemo>
   Future<void> _playAnimation() async {
     try {
       await _controller.forward().orCancel;
-      await _controller.reverse().orCancel;
+      // await _controller.reverse().orCancel;
     } on TickerCanceled {
       // the animation got canceled, probably because we were disposed
     }
@@ -152,7 +159,7 @@ class _StaggerDemoState extends State<StaggerDemo>
 
   @override
   Widget build(BuildContext context) {
-    timeDilation = 7.0; // 1.0 is normal animation speed.
+    timeDilation = 8.0; // 1.0 is normal animation speed.
     return Scaffold(
       appBar: AppBar(
         title: const Text('Staggered Animation'),
@@ -163,17 +170,7 @@ class _StaggerDemoState extends State<StaggerDemo>
           _playAnimation();
         },
         child: Center(
-          child: Container(
-            width: 300.0,
-            height: 300.0,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.1),
-              border: Border.all(
-                color: Colors.black.withOpacity(0.5),
-              ),
-            ),
-            child: StaggerAnimation(controller: _controller.view),
-          ),
+          child: StaggerAnimation(controller: _controller.view),
         ),
       ),
     );

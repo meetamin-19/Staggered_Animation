@@ -2,10 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:untitled4/second.dart';
-
-
-
-
+import 'package:untitled4/third.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
@@ -39,139 +37,100 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return StaggerDemo();
-    //   GestureDetector(
-    //   onPanUpdate: (details) async {
-    //     swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
-    //   },
-    //   onPanEnd: (details) async {
-    //     if (swipeDirection == null || swipeDirection == 'left') {
-    //       return;
-    //     }
-    //     else if (swipeDirection == 'right') {
-    //       Navigator.push(context, FadeRoute(page: SecondPage()));
-    //     }
-    //   },
-    //   child: Scaffold(
-    //     backgroundColor: Colors.black,
-    //     body: Stack(
-    //       children: [
-    //         Column(
-    //           mainAxisAlignment: MainAxisAlignment.start,
-    //           crossAxisAlignment: CrossAxisAlignment.start,
-    //           children: <Widget>[
-    //             InkWell(
-    //               onTap: () {
-    //                 Navigator.of(context).push(FadeRoute(page: SecondPage()));
-    //               },
-    //               child: Center(
-    //                 child: Padding(
-    //                   padding: EdgeInsets.only(
-    //                       top: MediaQuery
-    //                           .of(context)
-    //                           .size
-    //                           .height * .15),
-    //                   child: SizedBox(
-    //                     height: MediaQuery
-    //                         .of(context)
-    //                         .size
-    //                         .height * .47,
-    //                     width: MediaQuery
-    //                         .of(context)
-    //                         .size
-    //                         .width * .92,
-    //                     child: Stack(
-    //                       children: [
-    //                         Positioned(
-    //                           left: MediaQuery.of(context).size.width *.2,
-    //                           top: MediaQuery.of(context).size.height * .3,
-    //                           child: Hero(
-    //                             tag: 11,
-    //                             child: Container(
-    //                               color: Colors.transparent,
-    //                               height: 10,
-    //                               width: 10,
-    //                             ),
-    //                           ),
-    //                         ),
-    //
-    //                         // Image.asset("assets/images/first.png")
-    //
-    //                         CustomPaint(
-    //                           size: Size(MediaQuery
-    //                               .of(context)
-    //                               .size
-    //                               .width,
-    //                               (MediaQuery
-    //                                   .of(context)
-    //                                   .size
-    //                                   .width * 1.0270935960591132).toDouble()),
-    //                           //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
-    //                           painter: FirstPicPainter(),
-    //                         ),
-    //
-    //                       ],
-    //                     ),
-    //                   ),
-    //                 ),
-    //               ),
-    //             ),
-    //           ],
-    //         ),
-    //         buildPositioned(context, SecondPage())
-    //       ],
-    //     ), // This trailing comma makes auto-formatting nicer for build methods.
-    //   ),
-    // );
+    return GestureDetector(
+      onPanUpdate: (details) async {
+        swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
+      },
+      onPanEnd: (details) async {
+        if (swipeDirection == null || swipeDirection == 'left') {
+          return;
+        }
+        else if (swipeDirection == 'right') {
+          Navigator.push(context, FadeRoute(page: SecondPage()));
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: ThirdScreen()
+        /*Stack(
+          children: [
+            Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                InkWell(
+                  onTap: () {
+                    // Navigator.of(context).push(FadeRoute(page: SecondPage()));
+                  },
+                  child: Center(
+                    child: Padding(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery
+                              .of(context)
+                              .size
+                              .height * .15),
+                      child: SizedBox(
+                        height: MediaQuery
+                            .of(context)
+                            .size
+                            .height * .57,
+                        width: MediaQuery
+                            .of(context)
+                            .size
+                            .width * .92,
+                        child: Center(child: Hero(tag: 11,child: Image.asset("assets/images/first.png"),)),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            buildPositioned(context, SecondPage())
+          ],
+        )*/, // This trailing comma makes auto-formatting nicer for build methods.
+      ),
+    );
   }
 }
 
-Positioned buildPositioned(BuildContext context, Widget route) {
-  return Positioned(
-      bottom: 5,
-      right: 5,
-      child: TextButton(
-        child: const Text(
-          "Next",
-          style: TextStyle(
-              color: Color(0xffB68B4C),
-              fontSize: 18,
-              fontWeight: FontWeight.w400),
-        ),
-        onPressed: () {
-          Navigator.of(context).push(FadeRoute(page: route));
-        },
-      ));
-}
 
+class SecondPage extends StatefulWidget  {
 
-class FadeRoute extends PageRouteBuilder {
-  final Widget page;
-
-  FadeRoute({required this.page})
-      : super(
-    pageBuilder: (BuildContext context,
-        Animation<double> animation,
-        Animation<double> secondaryAnimation,) =>
-    page,
-    transitionDuration: const Duration(milliseconds: 400),
-    transitionsBuilder: (BuildContext context,
-        Animation<double> animation,
-        Animation<double> secondaryAnimation,
-        Widget child,) =>
-        FadeTransition(
-          opacity: animation,
-          child: child,
-          alwaysIncludeSemantics: true,
-        ),
-  );
-}
-
-class SecondPage extends StatelessWidget {
-
-  var swipeDirection;
 
   SecondPage({Key? key}) : super(key: key);
+
+  @override
+  State<SecondPage> createState() => _SecondPageState();
+}
+
+class _SecondPageState extends State<SecondPage> with TickerProviderStateMixin{
+
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 900), vsync: this);
+    _playAnimation();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playAnimation() async {
+    try {
+      await _controller.forward().orCancel;
+      // await _controller.reverse().orCancel;
+    } on TickerCanceled {
+      // the animation got canceled, probably because we were disposed
+    }
+  }
+  var swipeDirection;
 
   @override
   Widget build(BuildContext context) {
@@ -207,31 +166,15 @@ class SecondPage extends StatelessWidget {
                       height: MediaQuery
                           .of(context)
                           .size
-                          .height * 0.58,
+                          .height * 0.7,
                       width: MediaQuery
                           .of(context)
                           .size
                           .width * .9,
-                      child: Hero(
-                          tag: 11,
-                          child:
-
-                          // Image.asset("assets/images/second.png")
-
-                        CustomPaint(
-                            size: Size(MediaQuery
-                                .of(context)
-                                .size
-                                .width, (MediaQuery
-                                .of(context)
-                                .size
-                                .width * 1.4109589041095891).toDouble()),
-                            //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
-                            painter: SecondCustomPainter(),
-                          )),
-                    ),
+                      child: StaggerAnimation(controller: _controller),
                   ),
                 ),
+                )
               ],
             ),
             buildPositioned(context, ThirdPage())
@@ -378,4 +321,45 @@ class SecondCustomPainter extends CustomPainter {
     return true;
   }
 }
+Positioned buildPositioned(BuildContext context, Widget route) {
+  return Positioned(
+      bottom: 5,
+      right: 5,
+      child: TextButton(
+        child: const Text(
+          "Next",
+          style: TextStyle(
+              color: Color(0xffB68B4C),
+              fontSize: 18,
+              fontWeight: FontWeight.w400),
+        ),
+        onPressed: () {
+          Navigator.of(context).push(FadeRoute(page: route));
+        },
+      ));
+}
+
+
+class FadeRoute extends PageRouteBuilder {
+  final Widget page;
+
+  FadeRoute({required this.page})
+      : super(
+    pageBuilder: (BuildContext context,
+        Animation<double> animation,
+        Animation<double> secondaryAnimation,) =>
+    page,
+    transitionDuration: const Duration(milliseconds: 600),
+    transitionsBuilder: (BuildContext context,
+        Animation<double> animation,
+        Animation<double> secondaryAnimation,
+        Widget child,) =>
+        FadeTransition(
+          opacity: animation,
+          child: child,
+          alwaysIncludeSemantics: true,
+        ),
+  );
+}
+
 
