@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled4/fourth.dart';
 import 'package:untitled4/third.dart';
 import 'main.dart';
 
@@ -9,42 +10,109 @@ class FifthScreen extends StatefulWidget {
   State<FifthScreen> createState() => _FifthScreenState();
 }
 
-class _FifthScreenState extends State<FifthScreen> {
+class _FifthScreenState extends State<FifthScreen>
+    with TickerProviderStateMixin {
+  var swipeDirection;
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 900), vsync: this);
+    _playAnimation();
+  }
+
+  @override
+  void dispose() {
+    reverseAnimation();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playAnimation() async {
+    try {
+      await _controller
+          .forward()
+          .orCancel;
+
+    } on TickerCanceled {
+      // the animation got canceled, probably because we were disposed
+    }
+  }
+
+  Future<void> reverseAnimation() async {
+    try {
+      await _controller
+          .reverse()
+          .orCancel;
+    } on TickerCanceled {
+
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        children: [
-          Center(
-              child: SizedBox(
-                  height: MediaQuery.of(context).size.height * .51,
-                  width: MediaQuery.of(context).size.width * .87,
-                  child: Image.asset("assets/images/thirdwoborder.png"))),
-          Center(
-              child: Hero(
-            tag: 9,
-            child: Transform.rotate(
-                angle: 0,
-                child: CustomPaint(
-                  size: Size(MediaQuery.of(context).size.width * .77,
-                      (MediaQuery.of(context).size.height * .51).toDouble()),
-                  //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
-                  painter: ThirdPainter(),
-                )),
-          )),
-          Positioned(
-              right: 10,
-              bottom: 10,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(context, FadeRoute(page: ThirdScreen()));
-                },
-                child: Text("Next", style: TextStyle(color: Color(0xffB68B4C))),
-              ))
-        ],
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: GestureDetector(
+        onPanUpdate: (details) async {
+          swipeDirection = details.delta.dx > 0 ? 'right' : 'left';
+        },
+        onPanEnd: (details) async {
+          if (swipeDirection == null) {
+            return;
+          }
+          else if (swipeDirection == 'left') {
+            reverseAnimateToPage(context, ThirdScreen(), _controller);
+          }
+          else if (swipeDirection == 'right') {
+            reverseAnimateToPage(context,FourthScreen(),_controller);
+          }
+        },
+        child: Stack(
+          children: [
+            StaggerAnimation1(controller: _controller, final_height: MediaQuery
+                .of(context)
+                .size
+                .height * .48, final_width: MediaQuery
+                .of(context)
+                .size
+                .width * .80),
+            // Center(
+            //     child: Hero(
+            //   tag: 9,
+            //   child: CustomPaint(
+            //     size: Size(MediaQuery.of(context).size.width * .80,
+            //         (MediaQuery.of(context).size.height * .48).toDouble()),
+            //     //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
+            //     painter: ThirdPainter(),
+            //   ),
+            // )),
+            // Center(
+            //     child: Hero(
+            //       tag: 8,
+            //       child: SizedBox(
+            //           height: MediaQuery.of(context).size.height * .54,
+            //           width: MediaQuery.of(context).size.width * .75,
+            //           child: Image.asset("assets/images/thirdwoborder.png")),
+            //     )),
+            Positioned(
+                right: 10,
+                bottom: 10,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(context, FadeRoute(page: ThirdScreen()));
+                  },
+                  child: Text(
+                      "Next", style: TextStyle(color: Color(0xffB68B4C))),
+                ))
+          ],
+        ),
       ),
     );
   }
+
 }
 
 //Add this CustomPaint widget to the Widget Tree
@@ -162,5 +230,105 @@ class ThirdPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return true;
+  }
+}
+
+class StaggerAnimation1 extends StatelessWidget {
+  StaggerAnimation1({
+    Key? key,
+    required this.controller,
+    required this.final_height,
+    required this.final_width,
+  })
+      :
+        rotation = Tween(begin: -0.5, end: 0.0).animate(CurvedAnimation(
+            parent: controller,
+            curve: const Interval(.1, .6, curve: Curves.easeOutCubic))),
+        opacity = Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: const Interval(
+              0.0,
+              .9,
+              curve: Curves.ease,
+            ),
+          ),
+        ),
+        width = Tween<double>(
+          begin: 200.0,
+          end: final_width,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: const Interval(
+              0.1,
+              0.9,
+              curve: Curves.easeOutCubic,
+            ),
+          ),
+        ),
+        height = Tween<double>(begin: 200.0, end: final_height).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: const Interval(
+              0.1,
+              0.9,
+              curve: Curves.easeOutCubic,
+            ),
+          ),
+        ),
+        super(key: key);
+
+  final Animation<double> controller;
+  final Animation<double> opacity;
+  final Animation<double> width;
+  final Animation<double> height;
+  final Animation<double> rotation;
+  final double final_height;
+  final double final_width;
+
+  Widget _buildAnimation(BuildContext context, Widget? child) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Center(
+            child: Hero(
+              tag: 9,
+              child: CustomPaint(
+                    size: Size(MediaQuery.of(context).size.width * .79,
+                        MediaQuery.of(context).size.height * 0.51),
+                //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
+                painter: ThirdPainter(),
+              ),
+            ),
+          ),
+          Center(
+            child: Opacity(
+              opacity: opacity.value,
+              child: Container(
+                width: width.value,
+                height: height.value,
+                child: Transform.rotate(
+                    angle: rotation.value,
+                    child: Image.asset("assets/images/thirdwoborder.png")),
+              ),
+            ),
+          ),
+        ],
+      ),
+
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      builder: _buildAnimation,
+      animation: controller,
+    );
   }
 }

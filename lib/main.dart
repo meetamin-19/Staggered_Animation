@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
-import 'package:flutter/widgets.dart';
+import 'package:untitled4/firstagain.dart';
+import 'package:untitled4/fourth.dart';
 import 'package:untitled4/second.dart';
 import 'package:untitled4/third.dart';
+
+import 'fifth.dart';
 
 void main() {
   runApp(const MyApp());
@@ -32,26 +34,33 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<MyHomePage> with TickerProviderStateMixin {
   var swipeDirection;
 
   @override
   Widget build(BuildContext context) {
+
+    late AnimationController _controller;
+
+      _controller = AnimationController(
+          duration: const Duration(milliseconds: 500), vsync: this);
+
+
     return GestureDetector(
       onPanUpdate: (details) async {
         swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
       },
       onPanEnd: (details) async {
         if (swipeDirection == null || swipeDirection == 'left') {
-          return;
+          Navigator.push(context,FadeRoute(page: FifthScreen()));
         }
         else if (swipeDirection == 'right') {
-          Navigator.push(context, FadeRoute(page: SecondPage()));
+          Navigator.push(context, FadeRoute(page: FourthScreen()));
         }
       },
-      child: Scaffold(
+      child: const Scaffold(
         backgroundColor: Colors.black,
-        body: ThirdScreen()
+        body: FirstAgain()
         /*Stack(
           children: [
             Column(
@@ -93,234 +102,215 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 }
 
+// SecondPage with customAnimation
 
-class SecondPage extends StatefulWidget  {
+// class SecondPage extends StatefulWidget  {
+//
+//
+//   SecondPage({Key? key}) : super(key: key);
+//
+//   @override
+//   State<SecondPage> createState() => _SecondPageState();
+// }
+//
+// class _SecondPageState extends State<SecondPage> with TickerProviderStateMixin {
+//
 
+//   var swipeDirection;
+//
+//   @override
+// Widget build(BuildContext context) {
+//   return GestureDetector(
+//     onPanUpdate: (details) async {
+//       swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
+//     },
+//     onPanEnd: (details) async {
+//       if (swipeDirection == null) {
+//         return;
+//       }
+//       else if (swipeDirection == 'left') {
+//         Navigator.pop(context);
+//       }
+//       else if (swipeDirection == 'right') {
+//         Navigator.push(context, FadeRoute(page: ThirdPage()));
+//       }
+//     },
+//     child: Scaffold(
+//       backgroundColor: Colors.black,
+//       body: Stack(
+//         children: [
+//           Column(
+//             mainAxisAlignment: MainAxisAlignment.start,
+//             children: [
+//               Center(
+//                 child: Padding(
+//                   padding: EdgeInsets.only(top: MediaQuery
+//                       .of(context)
+//                       .size
+//                       .height * .08),
+//                   child: SizedBox(
+//                     height: MediaQuery
+//                         .of(context)
+//                         .size
+//                         .height * 0.7,
+//                     width: MediaQuery
+//                         .of(context)
+//                         .size
+//                         .width * .9,
+//                     child: StaggerAnimation(controller: _controller),
+//                 ),
+//               ),
+//               )
+//             ],
+//           ),
+//           buildPositioned(context, ThirdPage())
+//         ],
+//       ),
+//     ),
+//   );
+// }
+// }
 
-  SecondPage({Key? key}) : super(key: key);
+// ThirdPage with customAnimation
 
-  @override
-  State<SecondPage> createState() => _SecondPageState();
-}
-
-class _SecondPageState extends State<SecondPage> with TickerProviderStateMixin{
-
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    _controller = AnimationController(
-        duration: const Duration(milliseconds: 900), vsync: this);
-    _playAnimation();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _playAnimation() async {
-    try {
-      await _controller.forward().orCancel;
-      // await _controller.reverse().orCancel;
-    } on TickerCanceled {
-      // the animation got canceled, probably because we were disposed
-    }
-  }
-  var swipeDirection;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanUpdate: (details) async {
-        swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
-      },
-      onPanEnd: (details) async {
-        if (swipeDirection == null) {
-          return;
-        }
-        else if (swipeDirection == 'left') {
-          Navigator.pop(context);
-        }
-        else if (swipeDirection == 'right') {
-          Navigator.push(context, FadeRoute(page: ThirdPage()));
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                Center(
-                  child: Padding(
-                    padding: EdgeInsets.only(top: MediaQuery
-                        .of(context)
-                        .size
-                        .height * .08),
-                    child: SizedBox(
-                      height: MediaQuery
-                          .of(context)
-                          .size
-                          .height * 0.7,
-                      width: MediaQuery
-                          .of(context)
-                          .size
-                          .width * .9,
-                      child: StaggerAnimation(controller: _controller),
-                  ),
-                ),
-                )
-              ],
-            ),
-            buildPositioned(context, ThirdPage())
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class ThirdPage extends StatelessWidget {
-
-  var swipeDirection;
-
-  ThirdPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onPanUpdate: (details) async {
-        swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
-      },
-      onPanEnd: (details) async {
-        if (swipeDirection == null || swipeDirection == 'right') {
-          return;
-        }
-        else if (swipeDirection == 'left') {
-          Navigator.pop(context);
-        }
-      },
-
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-          Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.only(top: MediaQuery
-                  .of(context)
-                  .size
-                  .height * .12),
-              child: Center(
-                child: SizedBox(
-                  height: MediaQuery
-                      .of(context)
-                      .size
-                      .height * .51,
-                  width: MediaQuery
-                      .of(context)
-                      .size
-                      .width * .87,
-                  child: CustomPaint(
-                    size: Size(MediaQuery
-                        .of(context)
-                        .size
-                        .width,
-                        (MediaQuery
-                            .of(context)
-                            .size
-                            .width * 1.0270935960591132).toDouble()),
-                    //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
-                    painter: FirstPicPainter(),
-                  ),
-                ),
-              ),
-            )
-              ],
-            ),
-            buildPositioned(context, MyHomePage())
-          ],
-        ),
-      ),
-    );
-  }
-}
+// class ThirdPage extends StatelessWidget {
+//
+//   var swipeDirection;
+//
+//   ThirdPage({Key? key}) : super(key: key);
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return GestureDetector(
+//       onPanUpdate: (details) async {
+//         swipeDirection = details.delta.dx > 0 ? 'left' : 'right';
+//       },
+//       onPanEnd: (details) async {
+//         if (swipeDirection == null || swipeDirection == 'right') {
+//           return;
+//         }
+//         else if (swipeDirection == 'left') {
+//           Navigator.pop(context);
+//         }
+//       },
+//
+//       child: Scaffold(
+//         backgroundColor: Colors.black,
+//         body: Stack(
+//           children: [
+//           Column(
+//           mainAxisAlignment: MainAxisAlignment.start,
+//           children: [
+//             Padding(
+//               padding: EdgeInsets.only(top: MediaQuery
+//                   .of(context)
+//                   .size
+//                   .height * .12),
+//               child: Center(
+//                 child: SizedBox(
+//                   height: MediaQuery
+//                       .of(context)
+//                       .size
+//                       .height * .51,
+//                   width: MediaQuery
+//                       .of(context)
+//                       .size
+//                       .width * .87,
+//                   child: CustomPaint(
+//                     size: Size(MediaQuery
+//                         .of(context)
+//                         .size
+//                         .width,
+//                         (MediaQuery
+//                             .of(context)
+//                             .size
+//                             .width * 1.0270935960591132).toDouble()),
+//                     //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
+//                     painter: FirstPicPainter(),
+//                   ),
+//                 ),
+//               ),
+//             )
+//               ],
+//             ),
+//             buildPositioned(context, MyHomePage())
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 
-//Copy this CustomPainter code to the Bottom of the File
-class FirstPicPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Path path_0 = Path();
-    path_0.moveTo(size.width * 0.4149064, size.height);
-    path_0.cubicTo(size.width * 0.6821404, size.height, size.width,
-        size.height * 0.6137290, size.width, size.height * 0.3528777);
-    path_0.cubicTo(
-        size.width, size.height * 0.09202614, size.width * 0.7711281, 0,
-        size.width * 0.5038941, 0);
-    path_0.cubicTo(size.width * 0.2366586, 0, 0, size.height * 0.1582585, 0,
-        size.height * 0.4191103);
-    path_0.cubicTo(
-        0, size.height * 0.6799616, size.width * 0.1476709, size.height,
-        size.width * 0.4149064, size.height);
-    path_0.close();
+// Copy this CustomPainter code to the Bottom of the File
+// class FirstPicPainter extends CustomPainter {
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     Path path_0 = Path();
+//     path_0.moveTo(size.width * 0.4149064, size.height);
+//     path_0.cubicTo(size.width * 0.6821404, size.height, size.width,
+//         size.height * 0.6137290, size.width, size.height * 0.3528777);
+//     path_0.cubicTo(
+//         size.width, size.height * 0.09202614, size.width * 0.7711281, 0,
+//         size.width * 0.5038941, 0);
+//     path_0.cubicTo(size.width * 0.2366586, 0, 0, size.height * 0.1582585, 0,
+//         size.height * 0.4191103);
+//     path_0.cubicTo(
+//         0, size.height * 0.6799616, size.width * 0.1476709, size.height,
+//         size.width * 0.4149064, size.height);
+//     path_0.close();
+//
+//     Paint paint_0_fill = Paint()
+//       ..style = PaintingStyle.fill;
+//     paint_0_fill.color = Color(0xffC4C4C4).withOpacity(1.0);
+//     canvas.drawPath(path_0, paint_0_fill);
+//   }
+//
+//   @override
+//   bool shouldRepaint(covariant CustomPainter oldDelegate) {
+//     return true;
+//   }
+// }
 
-    Paint paint_0_fill = Paint()
-      ..style = PaintingStyle.fill;
-    paint_0_fill.color = Color(0xffC4C4C4).withOpacity(1.0);
-    canvas.drawPath(path_0, paint_0_fill);
-  }
 
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
+// Copy this CustomPainter code to the Bottom of the File
+// class SecondCustomPainter extends CustomPainter {
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     Path path_0 = Path();
+//     path_0.moveTo(size.width * 0.3725726, size.height * 0.9987748);
+//     path_0.cubicTo(
+//         size.width * 0.6698137, size.height * 0.9987748, size.width * 0.9999699,
+//         size.height * 0.6633883, size.width * 0.9999699,
+//         size.height * 0.4521728);
+//     path_0.cubicTo(
+//         size.width * 0.9999699, size.height * 0.2409553, size.width * 0.4073973,
+//         size.height * -0.1456678, size.width * 0.1164077,
+//         size.height * 0.05702641);
+//     path_0.cubicTo(size.width * -0.01577986, size.height * 0.1491035,
+//         size.width * -0.006224411, size.height * 0.2350272,
+//         size.width * 0.007594740, size.height * 0.3592893);
+//     path_0.cubicTo(size.width * 0.01242556, size.height * 0.4027301,
+//         size.width * 0.01777740, size.height * 0.4508544,
+//         size.width * 0.01777740, size.height * 0.5055631);
+//     path_0.cubicTo(size.width * 0.01777740, size.height * 0.7167786,
+//         size.width * 0.07532932, size.height * 0.9987748,
+//         size.width * 0.3725726, size.height * 0.9987748);
+//     path_0.close();
+//
+//     Paint paint0Fill = Paint()
+//       ..style = PaintingStyle.fill;
+//     paint0Fill.color = Color(0xffC4C4C4).withOpacity(1.0);
+//     canvas.drawPath(path_0, paint0Fill);
+//   }
+//
+//   @override
+//   bool shouldRepaint(covariant CustomPainter oldDelegate) {
+//     return true;
+//   }
+// }
 
 
-//Copy this CustomPainter code to the Bottom of the File
-class SecondCustomPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    Path path_0 = Path();
-    path_0.moveTo(size.width * 0.3725726, size.height * 0.9987748);
-    path_0.cubicTo(
-        size.width * 0.6698137, size.height * 0.9987748, size.width * 0.9999699,
-        size.height * 0.6633883, size.width * 0.9999699,
-        size.height * 0.4521728);
-    path_0.cubicTo(
-        size.width * 0.9999699, size.height * 0.2409553, size.width * 0.4073973,
-        size.height * -0.1456678, size.width * 0.1164077,
-        size.height * 0.05702641);
-    path_0.cubicTo(size.width * -0.01577986, size.height * 0.1491035,
-        size.width * -0.006224411, size.height * 0.2350272,
-        size.width * 0.007594740, size.height * 0.3592893);
-    path_0.cubicTo(size.width * 0.01242556, size.height * 0.4027301,
-        size.width * 0.01777740, size.height * 0.4508544,
-        size.width * 0.01777740, size.height * 0.5055631);
-    path_0.cubicTo(size.width * 0.01777740, size.height * 0.7167786,
-        size.width * 0.07532932, size.height * 0.9987748,
-        size.width * 0.3725726, size.height * 0.9987748);
-    path_0.close();
-
-    Paint paint0Fill = Paint()
-      ..style = PaintingStyle.fill;
-    paint0Fill.color = Color(0xffC4C4C4).withOpacity(1.0);
-    canvas.drawPath(path_0, paint0Fill);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
-}
 Positioned buildPositioned(BuildContext context, Widget route) {
   return Positioned(
       bottom: 5,
@@ -354,11 +344,7 @@ class FadeRoute extends PageRouteBuilder {
         Animation<double> animation,
         Animation<double> secondaryAnimation,
         Widget child,) =>
-        FadeTransition(
-          opacity: animation,
-          child: child,
-          alwaysIncludeSemantics: true,
-        ),
+        child,
   );
 }
 

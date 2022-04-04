@@ -1,186 +1,115 @@
+// Copyright 2017 The Chromium Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style license that
+// can be found in the LICENSE file.
+
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart' show timeDilation;
 
-class StaggerAnimation extends StatefulWidget {
-  StaggerAnimation({Key? key, required this.controller});
+import 'fourth.dart';
 
-  final Animation<double> controller;
-
-  @override
-  State<StaggerAnimation> createState() => _StaggerAnimationState();
-}
-
-class _StaggerAnimationState extends State<StaggerAnimation> {
-  late final Animation<double> opacity;
-  late final Animation<double> opacity_border;
-  late final Animation<double> rotation;
-  late final Animation<double> rotation_border;
-  late final Animation<double> width;
-  late final Animation<double> width_border;
-  late final Animation<double> height;
-  late final Animation<double> height_border;
-
-  Widget _buildAnimation(BuildContext context, Widget? child) {
-    var h = MediaQuery.of(context).size.height;
-    var w = MediaQuery.of(context).size.width;
-    return Stack(
-      children: [
-        Container(
-          alignment: Alignment.center,
-          child: SizedBox(
-            width: h * 0.6,
-            height: w * 0.8,
-            child: Opacity(
-                opacity: opacity.value,
-                child: Hero(
-                    tag: 8,
-                    child: Image.asset("assets/images/secondwoborder.png"))),
+class StaggerAnimation extends StatelessWidget {
+  StaggerAnimation({
+    Key? key,
+    required this.controller,
+    required this.final_height,
+    required this.final_width,
+  })  :
+        rotation = Tween(begin: -0.5, end: 0.0).animate(CurvedAnimation(
+            parent: controller,
+            curve: Interval(.1, .6, curve: Curves.easeOutCubic))),
+        opacity = Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: const Interval(
+              0.0,
+              .8,
+              curve: Curves.ease,
+            ),
           ),
         ),
-        Center(
-          child: SizedBox(
-              width: w * .78,
-              height: h * .65,
-              child:
-                  Hero(tag: 9, child: Image.asset("assets/images/border.png"))),
-          // ),
-        )
-      ],
-    );
-  }
+        width = Tween<double>(
+          begin: 200.0,
+          end: final_width,
+        ).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: const Interval(
+              0.1,
+              0.8,
+              curve: Curves.easeOutCubic,
+            ),
+          ),
+        ),
+        height = Tween<double>(begin: 200.0, end: final_height).animate(
+          CurvedAnimation(
+            parent: controller,
+            curve: const Interval(
+              0.1,
+              0.8,
+              curve: Curves.easeOutCubic,
+            ),
+          ),
+        ),
+        super(key: key);
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    opacity = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(
-      CurvedAnimation(
-          parent: widget.controller,
-          curve: const Interval(
-            0.2,
-            0.8,
-            curve: Curves.easeInCirc,
-          )),
-    );
-    opacity_border = Tween<double>(
-      begin: 1.0,
-      end: 1,
-    ).animate(CurvedAnimation(
-        parent: widget.controller,
-        curve: const Interval(0.0, 0.5, curve: Curves.easeInCirc)));
-    width_border = Tween<double>(
-      begin: 150.0,
-      end: 320.0,
-    ).animate(
-      CurvedAnimation(
-        parent: widget.controller,
-        curve: Curves.ease,
+  final Animation<double> controller;
+  final Animation<double> opacity;
+  final Animation<double> width;
+  final Animation<double> height;
+  final Animation<double> rotation;
+  final double final_height;
+  final double final_width;
+
+  // This function is called each time the controller "ticks" a new frame.
+  // When it runs, all of the animation's values will have been
+  // updated to reflect the controller's current value.
+  Widget _buildAnimation(BuildContext context, Widget? child) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          Positioned(
+            left: 40,
+            top: 140,
+            child: Hero(
+              tag: 9,
+              child: CustomPaint(
+                size: Size(MediaQuery.of(context).size.width * .8,
+                    MediaQuery.of(context).size.height * 0.6),
+                //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
+                painter: SecondPainter(),
+              ),
+            ),
+          ),
+          Center(
+            child: Opacity(
+              opacity: opacity.value,
+              child: Container(
+                width: width.value,
+                height: height.value,
+                child: Transform.rotate(
+                    angle: rotation.value,
+                    child: Image.asset("assets/images/secondwoborder.png")),
+              ),
+            ),
+          ),
+        ],
       ),
+
     );
-    width = Tween<double>(
-      begin: 300.0,
-      end: 300,
-    ).animate(
-      CurvedAnimation(
-        parent: widget.controller,
-        curve: Curves.ease,
-      ),
-    );
-    height_border = Tween<double>(begin: 400, end: 440).animate(
-      CurvedAnimation(
-        parent: widget.controller,
-        curve: const Interval(0.3, 1.0, curve: Curves.ease),
-      ),
-    );
-    height = Tween<double>(begin: 200, end: 420).animate(
-      CurvedAnimation(
-        parent: widget.controller,
-        curve: Interval(0.0, 0.8, curve: Curves.ease),
-      ),
-    );
-    rotation_border = Tween(begin: -1.0, end: 0.0).animate(
-      CurvedAnimation(
-          parent: widget.controller,
-          curve: Interval(0.2, .9, curve: Curves.easeInCirc)),
-    );
-    rotation = Tween(begin: -1.0, end: 0.0).animate(
-      CurvedAnimation(
-          parent: widget.controller,
-          curve: Interval(0.2, 0.6, curve: Curves.easeIn)),
-    );
-    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       builder: _buildAnimation,
-      animation: widget.controller,
+      animation: controller,
     );
   }
-}
-
-class StaggerDemo extends StatefulWidget {
-  const StaggerDemo({Key? key}) : super(key: key);
-
-  @override
-  _StaggerDemoState createState() => _StaggerDemoState();
-}
-
-class _StaggerDemoState extends State<StaggerDemo>
-    with TickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-        duration: const Duration(milliseconds: 700), vsync: this);
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  Future<void> _playAnimation() async {
-    try {
-      await _controller.forward().orCancel;
-      // await _controller.reverse().orCancel;
-    } on TickerCanceled {
-      // the animation got canceled, probably because we were disposed
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    timeDilation = 8.0; // 1.0 is normal animation speed.
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Staggered Animation'),
-      ),
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          _playAnimation();
-        },
-        child: Center(
-          child: StaggerAnimation(controller: _controller.view),
-        ),
-      ),
-    );
-  }
-}
-
-void main() {
-  runApp(
-    const MaterialApp(
-      home: StaggerDemo(),
-    ),
-  );
 }

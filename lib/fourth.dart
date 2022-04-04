@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:untitled4/fifth.dart';
+import 'package:untitled4/second.dart';
+import 'package:untitled4/third.dart';
 
 import 'main.dart';
 
@@ -10,44 +13,124 @@ class FourthScreen extends StatefulWidget {
   State<FourthScreen> createState() => _FourthScreenState();
 }
 
-class _FourthScreenState extends State<FourthScreen> with TickerProviderStateMixin {
+class _FourthScreenState extends State<FourthScreen>
+    with TickerProviderStateMixin {
+  var swipeDirection;
+
+  late AnimationController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+        duration: const Duration(milliseconds: 900), vsync: this);
+    _playAnimation();
+  }
+
+  @override
+  void dispose() {
+    reverseAnimation();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Future<void> _playAnimation() async {
+    try {
+      await _controller
+          .forward()
+          .orCancel;
+      // await _controller
+      //     .reverse()
+      //     .orCancel;
+    } on TickerCanceled {
+      // the animation got canceled, probably because we were disposed
+    }
+  }
+
+  Future<void> reverseAnimation() async{
+    try{
+      await _controller.reverse().orCancel;
+    }on TickerCanceled {
+
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Stack(
-        children: [
-          Center(
-              child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.6,
-                  width: MediaQuery.of(context).size.width * .8,
-                  child: Image.asset("assets/images/secondwoborder.png"))),
-          Center(
-              child: Hero(
-            tag: 9,
-            child: Transform.rotate(
-              angle: 0,
-              child: CustomPaint(
-                size: Size(MediaQuery.of(context).size.width * .78,
-                    (MediaQuery.of(context).size.height * 0.65).toDouble()),
-                //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
-                painter: SecondPainter(),
-              ),
-            ),
-          )),
-          Positioned(
-              right: 10,
-              bottom: 10,
-              child: TextButton(
-                onPressed: () {
-                  Navigator.push(context, FadeRoute(page: FifthScreen()));
-                },
-                child: Text("Next", style: TextStyle(color: Color(0xffB68B4C))),
-              ))
-        ],
-      ),
+    // timeDilation = 1;
+
+    return GestureDetector(
+        onPanUpdate: (details) async {
+          swipeDirection = details.delta.dx > 0 ? 'right' : 'left';
+        },
+        onPanEnd: (details) async {
+          if (swipeDirection == null) {
+            return;
+          }
+          else if (swipeDirection == 'left') {
+            reverseAnimateToPage(context, FifthScreen(),_controller);
+          }
+          else if (swipeDirection == 'right')  {
+             reverseAnimateToPage(context,ThirdScreen(),_controller);
+          }
+        },
+        child: Stack(
+          children: [
+            StaggerAnimation(controller: _controller, final_height: MediaQuery
+                .of(context)
+                .size
+                .height * 0.6, final_width : MediaQuery
+                .of(context)
+                .size
+                .width * .8),
+            // Center(
+            //     child: Hero(
+            //       tag: 8,
+            //       child: SizedBox(
+            //           height: MediaQuery.of(context).size.height * 0.6,
+            //           width: MediaQuery.of(context).size.width * .8,
+            //           child: Image.asset("assets/images/secondwoborder.png")),
+            //     )),
+            // Center(
+            //     child: Hero(
+            //   tag: 9,
+            //   child: CustomPaint(
+            //     size: Size(MediaQuery.of(context).size.width * .78,
+            //         MediaQuery.of(context).size.height * 0.6),
+            //     //You can Replace [WIDTH] with your desired width for Custom Paint and height will be calculated automatically
+            //     painter: SecondPainter(),
+            //   ),
+            // )
+            // ),
+
+            // StaggerAnimation(controller: _controller),
+
+            Positioned(
+                right: 10,
+                bottom: 10,
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context, FadeRoute(page: const FifthScreen()));
+                  },
+                  child: const Text(
+                      "Next", style: TextStyle(color: Color(0xffB68B4C))),
+                ))
+          ],
+        ),
     );
   }
+
+
+}
+
+void reverseAnimateToPage(BuildContext context,Widget screen, AnimationController controller) async {
+  controller
+      .reverse()
+      .orCancel;
+  Navigator.push(context, FadeRoute(page: screen));
 }
 
 class SecondPainter extends CustomPainter {
@@ -158,7 +241,7 @@ class SecondPainter extends CustomPainter {
     Paint paint_0_stroke = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1;
-    paint_0_stroke.color = Color(0xffB68B4C).withOpacity(1.0);
+    paint_0_stroke.color = const Color(0xffB68B4C).withOpacity(1.0);
     canvas.drawPath(path_0, paint_0_stroke);
 
     // Paint paint_0_fill = Paint()..style = PaintingStyle.fill;
